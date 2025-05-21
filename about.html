@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en" manifest="cache.manifest">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About PSFree</title>
+    <style>
+        /* CSS Variables for theming */
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #7b68ee; /* Medium slate blue */
+            --accent-secondary: #4169e1; /* Royal blue */
+            --offline-color: #9c27b0;
+            --success-color: #4caf50;
+            --transition-speed: 0.3s;
+        }
+
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.01) 2%, transparent 0%), 
+                radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.01) 2%, transparent 0%);
+            background-size: 100px 100px;
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(123, 104, 238, 0.3);
+            margin-bottom: 10px;
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+
+        a:hover, a:focus {
+            color: var(--accent-secondary);
+            text-decoration: underline;
+        }
+
+        main {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        /* License table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: var(--bg-tertiary);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-primary);
+        }
+
+        th {
+            background-color: rgba(123, 104, 238, 0.2);
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Section styles */
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: var(--accent-primary);
+            border-bottom: 1px solid var(--bg-tertiary);
+            padding-bottom: 5px;
+        }
+
+        .file-list {
+            list-style-type: none;
+        }
+
+        .file-list li {
+            margin-bottom: 5px;
+        }
+
+        /* Back button */
+        .back-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-button:hover, .back-button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Focus states for controller navigation */
+        button:focus, a:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 8px;
+            vertical-align: middle;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(-5px);
+            animation: slideDown 0.3s forwards;
+        }
+        
+        .status-badge.offline {
+            background-color: var(--offline-color);
+            color: white;
+        }
+        
+        .status-badge.cached {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(123, 104, 238, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(123, 104, 238, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(123, 104, 238, 0.5); }
+        }
+
+        /* For PS4 browser optimization */
+        @media screen and (max-width: 1080px) {
+            body {
+                padding: 15px;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>About PSFree</h1>
+        </header>
+        
+        <main>
+            <section>
+                <p>PSFree is an exploit for PS4 and PS5.</p>
+                <p>PSFree is free software. See <a href="./COPYING">COPYING</a> for the copyleft information.</p>
+                <p>PSFree's license is GNU-AGPL-3.0-or-later.</p>
+                <p>Here is the source code of this program:</p>
+            </section>
+            
+            <section>
+                <h2>HTML Files</h2>
+                <ul class="file-list">
+                    <li><a href="./index.html" download>index.html</a></li>
+                    <li><a href="./about.html" download>about.html</a></li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2>JavaScript Files</h2>
+                <table id="jslicense-labels1">
+                    <tr>
+                        <th>File</th>
+                        <th>License</th>
+                        <th>Download</th>
+                    </tr>
+                    <tr>
+                        <td><a href="./psfree.mjs">psfree.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./psfree.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./alert.mjs">alert.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./alert.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./config.mjs">config.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./config.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./send.mjs">send.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./send.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./lapse.mjs">lapse.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./lapse.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./rop/900.mjs">rop/900.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./rop/900.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/chain.mjs">module/chain.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/chain.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/int64.mjs">module/int64.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/int64.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/view.mjs">module/view.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/view.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/memtools.mjs">module/memtools.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/memtools.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/utils.mjs">module/utils.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/utils.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/rw.mjs">module/rw.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/rw.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/offset.mjs">module/offset.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/offset.mjs" download>download</a></td>
+                    </tr>
+                    <tr>
+                        <td><a href="./module/mem.mjs">module/mem.mjs</a></td>
+                        <td><a href="https://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0-or-later</a></td>
+                        <td><a href="./module/mem.mjs" download>download</a></td>
+                    </tr>
+                </table>
+            </section>
+            
+            <section>
+                <h2>kpatch Files</h2>
+                <ul class="file-list">
+                    <li><a href="./kpatch/utils.h" download>kpatch/utils.h</a></li>
+                    <li><a href="./kpatch/script.ld" download>kpatch/script.ld</a></li>
+                    <li><a href="./kpatch/Makefile" download>kpatch/Makefile</a></li>
+                    <li><a href="./kpatch/900.c" download>kpatch/900.c</a></li>
+                    <li><a href="./kpatch/types.h" download>kpatch/types.h</a></li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2>Fonts</h2>
+                <ul class="file-list">
+                    <li><a href="./fonts/README.txt" download>fonts/README.txt</a></li>
+                    <li><a href="./fonts/FONTS.LICENSE" download>fonts/FONTS.LICENSE</a></li>
+                    <li><a href="./fonts/LiberationMono-Regular.ttf" download>fonts/LiberationMono-Regular.ttf</a></li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2>Documentation</h2>
+                <ul class="file-list">
+                    <li><a href="./COPYING" download>COPYING</a></li>
+                    <li><a href="./LICENSE" download>LICENSE</a></li>
+                    <li><a href="./README.md" download>README.md</a></li>
+                </ul>
+            </section>
+            
+            <a href="./index.html" class="back-button">Back to Exploit</a>
+        </main>
+    </div>
+    
+    <!-- Cache Management Script -->
+    <script>
+        // Enhanced offline mode detection and status indication
+        if (window.applicationCache) {
+            const appCache = window.applicationCache;
+            const isOffline = !navigator.onLine;
+            
+            if (isOffline) {
+                // Create offline notice with improved styling
+                const offlineNotice = document.createElement('div');
+                offlineNotice.style.textAlign = 'center';
+                offlineNotice.style.padding = '12px';
+                offlineNotice.style.backgroundColor = 'rgba(65, 105, 225, 0.1)';
+                offlineNotice.style.borderRadius = '8px';
+                offlineNotice.style.marginBottom = '20px';
+                offlineNotice.style.border = '1px solid rgba(255, 255, 255, 0.05)';
+                offlineNotice.style.animation = 'fadeIn 0.5s ease-out';
+                
+                // Add status badges for better visibility
+                if (appCache.status === appCache.IDLE || localStorage.getItem('psfree_cache_status') == 1) {
+                    document.body.classList.add('offline-mode');
+                    
+                    // Create status indicator with badges
+                    const statusContainer = document.createElement('div');
+                    statusContainer.style.display = 'flex';
+                    statusContainer.style.alignItems = 'center';
+                    statusContainer.style.justifyContent = 'center';
+                    
+                    const statusText = document.createElement('span');
+                    statusText.textContent = 'Running in offline mode';
+                    statusContainer.appendChild(statusText);
+                    
+                    // Add offline badge
+                    const offlineBadge = document.createElement('span');
+                    offlineBadge.className = 'status-badge offline';
+                    offlineBadge.textContent = 'OFFLINE';
+                    offlineBadge.style.marginLeft = '8px';
+                    statusContainer.appendChild(offlineBadge);
+                    
+                    // Add cached badge
+                    const cachedBadge = document.createElement('span');
+                    cachedBadge.className = 'status-badge cached';
+                    cachedBadge.textContent = 'CACHED';
+                    cachedBadge.style.marginLeft = '8px';
+                    cachedBadge.style.animationDelay = '0.1s';
+                    statusContainer.appendChild(cachedBadge);
+                    
+                    offlineNotice.appendChild(statusContainer);
+                    
+                    // Add subtle glow to main content
+                    setTimeout(() => {
+                        document.querySelector('main').style.animation = 'glow 3s infinite';
+                    }, 500);
+                } else {
+                    offlineNotice.textContent = 'Warning: Offline but not cached!';
+                    offlineNotice.style.backgroundColor = 'rgba(255, 152, 0, 0.1)';
+                    offlineNotice.style.borderLeft = '4px solid #ff9800';
+                }
+                
+                document.querySelector('.container').insertBefore(offlineNotice, document.querySelector('main'));
+            }
+            
+            // Store cache status for future checks
+            try {
+                localStorage.setItem('psfree_cache_status', appCache.status);
+            } catch (e) {
+                console.log('LocalStorage not available', e);
+            }
+        }
+    </script>
+</body>
+</html>

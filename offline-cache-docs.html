@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en" manifest="cache.manifest">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayStation Pulse PSFree Host 9.00 Documentation</title>
+    <style>
+        /* CSS Variables for theming */
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #7b68ee; /* Medium slate blue */
+            --accent-secondary: #4169e1; /* Royal blue */
+            --code-bg: #2a2a2a;
+            --transition-speed: 0.3s;
+        }
+
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(123, 104, 238, 0.3);
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin: 25px 0 15px;
+            color: var(--accent-primary);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin: 20px 0 10px;
+            color: var(--text-primary);
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+
+        a:hover, a:focus {
+            color: var(--accent-secondary);
+            text-decoration: underline;
+        }
+
+        main {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Code blocks */
+        pre {
+            background-color: var(--code-bg);
+            border-radius: 6px;
+            padding: 15px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background-color: rgba(65, 105, 225, 0.1);
+            border-left: 4px solid var(--accent-primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        .warning-box {
+            background-color: rgba(255, 152, 0, 0.1);
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+
+        /* Back button */
+        .back-button {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-button:hover, .back-button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        /* Focus states for controller navigation */
+        button:focus, a:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* For PS4 browser optimization */
+        @media screen and (max-width: 1080px) {
+            body {
+                padding: 15px;
+            }
+            
+            main {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PlayStation Pulse PSFree Host 9.00 Documentation</h1>
+        </header>
+        
+        <main>
+            <section>
+                <h2>How PSFree Offline Caching Works</h2>
+                <p>PSFree implements offline caching using HTML5 Application Cache, allowing the exploit to function without an internet connection after initial setup.</p>
+                
+                <div class="info-box">
+                    <strong>Important:</strong> You must cache PSFree while online before attempting to use it offline. Follow the testing instructions below to properly set up offline functionality.
+                </div>
+                
+                <h3>Implementation Details</h3>
+                <p>The offline caching system uses several key components:</p>
+                
+                <ol>
+                    <li><strong>Cache Manifest File</strong> - Lists all required resources to be cached</li>
+                    <li><strong>Application Cache API</strong> - Manages the caching process</li>
+                    <li><strong>User Interface</strong> - Provides status indicators and control button</li>
+                </ol>
+                
+                <h3>Cache Status Events</h3>
+                <p>The application monitors several cache events to keep users informed:</p>
+                <ul>
+                    <li><code>checking</code> - Verifying the manifest</li>
+                    <li><code>downloading</code> - Downloading resources</li>
+                    <li><code>progress</code> - Resource download progress</li>
+                    <li><code>cached</code> - Caching successfully completed</li>
+                    <li><code>updateready</code> - New version available</li>
+                    <li><code>error</code> - Caching error occurred</li>
+                </ul>
+                
+                <div class="info-box">
+                    <strong>Updates:</strong> The script can be updated and supplemented regularly. You will always have an up-to-date working version.
+                </div>
+            </section>
+            
+            <section>
+                <h2>Testing Offline Functionality on PS4</h2>
+                
+                <h3>Initial Setup (Online)</h3>
+                <ol>
+                    <li>Open the PSFree exploit page on your PS4 browser while connected to the internet</li>
+                    <li>Click the "Cache for Offline Use" button</li>
+                    <li>Wait for the cache process to complete - the status indicator will display "Cached and Ready for Offline Use"</li>
+                    <li>Once caching is complete, you'll see a confirmation message</li>
+                </ol>
+                
+                <div class="warning-box">
+                    <strong>Note:</strong> The first time you run the exploit after caching, it should still be with an internet connection to verify everything works properly.
+                </div>
+                
+                <h3>Testing Offline Mode</h3>
+                <ol>
+                    <li>After successful caching, disconnect your PS4 from the internet (disable Wi-Fi or disconnect Ethernet)</li>
+                    <li>Close and reopen the PS4 browser</li>
+                    <li>Navigate to the PSFree exploit URL (it should load from cache)</li>
+                    <li>Verify that the page loads with a status indicator showing "Offline Mode (Cached)"</li>
+                    <li>The exploit should run automatically as normal</li>
+                </ol>
+                
+                <h3>Testing After PS4 Reboot</h3>
+                <ol>
+                    <li>Power off your PS4 completely</li>
+                    <li>Power on your PS4, but <strong>do not connect to the internet</strong></li>
+                    <li>Open the PS4 browser and navigate to the PSFree URL</li>
+                    <li>The page should load from cache and the exploit should run normally</li>
+                </ol>
+                
+                <h3>Troubleshooting</h3>
+                <p>If you encounter issues with offline functionality:</p>
+                <ul>
+                    <li><strong>Cache not working:</strong> Reconnect to the internet, reload the page, and click "Recache Resources"</li>
+                    <li><strong>Page won't load offline:</strong> Your cache may have been cleared. You need to reconnect and cache the exploit again</li>
+                    <li><strong>Exploit fails in offline mode:</strong> Ensure you've cached the most recent version with a working internet connection first</li>
+                    <li><strong>Update available:</strong> If you see "Cache update available", connect to the internet and click "Apply Update"</li>
+                </ul>
+                
+                <h3>Visual Indicators</h3>
+                <p>The PSFree interface now includes several visual indicators to help you understand the current status:</p>
+                <ul>
+                    <li><strong>OFFLINE Badge:</strong> Appears when you're disconnected from the internet</li>
+                    <li><strong>CACHED Badge:</strong> Appears when you're offline but have successfully cached resources</li>
+                    <li><strong>Console Highlighting:</strong> Different message types are now color-coded for better readability</li>
+                    <li><strong>Stage Progress:</strong> Exploit stages now show clearer progress indicators</li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2>Technical Details</h2>
+                
+                <h3>Cache Size and Limitations</h3>
+                <p>The PS4 browser typically allows around 50MB of application cache storage. PSFree's resources including the binary payload require approximately 2-3MB of cache, well within the limit.</p>
+                
+                <h3>Cache Versioning</h3>
+                <p>The cache manifest includes a version comment line. When the manifest is updated (e.g., when files change or new versions are released), the browser will detect the change and refresh the cache with the new content.</p>
+                
+                <h3>PS4/PS5 Browser Compatibility</h3>
+                <p>The PS4/PS5 browsers are based on WebKit and support HTML5 Application Cache. The implementation has been optimized specifically for these browsers' rendering engines and memory constraints. The enhanced UI provides a better visual experience while maintaining full compatibility.</p>
+                
+                <h3>Security Considerations</h3>
+                <p>Cached resources are stored locally on your PS4. No data is sent back to servers when running in offline mode. This implementation ensures the exploit runs entirely on your device without external connections.</p>
+            </section>
+            
+            <a href="./index.html" class="back-button">Back to Exploit</a>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en" manifest="cache.manifest">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlayStation Pulse PSFree Host 9.00</title>
+    <style>
+        /* Custom font for console */
+        @font-face {
+            font-family: 'logging';
+            src: url('fonts/LiberationMono-Regular.ttf');
+        }
+
+        /* CSS Variables for theming */
+        :root {
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --bg-tertiary: #2d2d2d;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-primary: #7b68ee; /* Medium slate blue */
+            --accent-secondary: #4169e1; /* Royal blue */
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --error-color: #f44336;
+            --info-color: #03a9f4;
+            --offline-color: #9c27b0;
+            --transition-speed: 0.3s;
+        }
+
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.01) 2%, transparent 0%), 
+                radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.01) 2%, transparent 0%);
+            background-size: 100px 100px;
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        a {
+            color: var(--accent-primary);
+            text-decoration: none;
+            transition: color var(--transition-speed);
+        }
+
+        a:hover, a:focus {
+            color: var(--accent-secondary);
+            text-decoration: underline;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+            flex: 1;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 1px;
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(123, 104, 238, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* Status indicator */
+        #status-container {
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        #status-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status-icon {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            margin-right: 10px;
+            transition: background-color var(--transition-speed);
+        }
+
+        .status-icon.ready {
+            background-color: var(--accent-primary);
+        }
+
+        .status-icon.running {
+            background-color: var(--warning-color);
+            animation: pulse 1s infinite;
+        }
+
+        .status-icon.success {
+            background-color: var(--success-color);
+        }
+
+        .status-icon.error {
+            background-color: var(--error-color);
+        }
+
+        #progress-bar {
+            height: 6px;
+            background-color: var(--bg-tertiary);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        #progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            transition: width 0.3s ease-out;
+            border-radius: 3px;
+        }
+
+        /* Console container */
+        #console-container {
+            background-color: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            overflow: auto;
+            max-height: 300px;
+            position: relative;
+            animation: fadeIn 1.2s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        #console {
+            font-family: 'logging', monospace;
+            white-space: pre-wrap;
+            color: var(--text-primary);
+            font-size: 14px;
+            overflow-wrap: break-word;
+            line-height: 1.4;
+        }
+        
+        /* Console highlights for different message types */
+        .console-success {
+            color: var(--success-color);
+            font-weight: 500;
+        }
+        
+        .console-error {
+            color: var(--error-color);
+            font-weight: 500;
+        }
+        
+        .console-stage {
+            color: var(--accent-primary);
+            font-weight: 500;
+        }
+        
+        .console-info {
+            color: var(--info-color);
+        }
+
+        /* Cache controls */
+        #cache-controls {
+            margin-bottom: 30px;
+            text-align: center;
+            animation: fadeIn 1.4s ease-out;
+        }
+
+        #cache-button {
+            background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            display: inline-block;
+        }
+
+        #cache-button:hover, #cache-button:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #cache-button:active {
+            transform: translateY(0);
+        }
+
+        #cache-status {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Focus states for controller navigation */
+        button:focus, a:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding-top: 20px;
+            margin-top: auto;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--bg-tertiary);
+            animation: fadeIn 1.6s ease-out;
+        }
+
+        .credits {
+            margin-bottom: 15px;
+        }
+
+        .credits p {
+            margin: 5px 0;
+        }
+
+        .license {
+            font-size: 0.8rem;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-left: 8px;
+            vertical-align: middle;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateY(-5px);
+            animation: slideDown 0.3s forwards;
+        }
+        
+        .status-badge.offline {
+            background-color: var(--offline-color);
+            color: white;
+        }
+        
+        .status-badge.cached {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes glow {
+            0% { box-shadow: 0 0 5px rgba(123, 104, 238, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(123, 104, 238, 0.8); }
+            100% { box-shadow: 0 0 5px rgba(123, 104, 238, 0.5); }
+        }
+
+        /* Spinner for loading states */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(123, 104, 238, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-primary);
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* For PS4 browser optimization */
+        @media screen and (max-width: 1080px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            #console {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>PlayStation Pulse PSFree Host 9.00</h1>
+            <p class="subtitle">With Online and Offline by Telegram PlayStation Pulse</p>
+        </header>
+        
+        <main>
+            <section id="status-container">
+                <div id="status-indicator">
+                    <div class="status-icon ready"></div>
+                    <span id="status-text">Ready</span>
+                </div>
+                <div id="progress-bar">
+                    <div id="progress-fill"></div>
+                </div>
+            </section>
+            
+            <section id="console-container">
+                <pre id="console"></pre>
+            </section>
+            
+            <section id="cache-controls">
+                <button id="cache-button">Cache for Offline Use</button>
+                <div id="cache-status">Not Cached</div>
+                <div style="margin-top: 8px; font-size: 0.9rem;">
+                    <a href="./offline-cache-docs.html">Documentation</a>
+                </div>
+            </section>
+        </main>
+        
+        <footer>
+            <div class="credits">
+                <p>Join <a href="https://t.me/PlayStation_Pulse" target="_blank">PlayStation Pulse</a> on Telegram</p>
+                <p>Created by <a href="https://t.me/sudoBlackArch" target="_blank">BlackArch</a></p>
+                <p>Exploit by <a href="https://github.com/kmeps4" target="_blank">kmeps4</a></p>
+            </div>
+            <div class="license">
+                <a href="./about.html" data-jslicense="1">JavaScript license information</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Cache Management Script -->
+    <script>
+        // Cache management
+        (function() {
+            const cacheButton = document.getElementById('cache-button');
+            const cacheStatus = document.getElementById('cache-status');
+            const statusText = document.getElementById('status-text');
+            const statusIcon = document.querySelector('.status-icon');
+            const progressFill = document.getElementById('progress-fill');
+            
+            // Check if application cache is supported
+            const appCache = window.applicationCache;
+            
+            if (!appCache) {
+                cacheStatus.textContent = 'Application Cache not supported in this browser';
+                cacheButton.disabled = true;
+                return;
+            }
+
+            // Update UI based on current cache status
+            function updateCacheStatus() {
+                switch (appCache.status) {
+                    case appCache.UNCACHED: // 0
+                        cacheStatus.textContent = 'Not Cached';
+                        cacheButton.textContent = 'Cache for Offline Use';
+                        break;
+                    case appCache.IDLE: // 1
+                        cacheStatus.textContent = 'Cached and Ready for Offline Use';
+                        cacheButton.textContent = 'Recache Resources';
+                        break;
+                    case appCache.CHECKING: // 2
+                        cacheStatus.textContent = 'Checking for cache updates...';
+                        break;
+                    case appCache.DOWNLOADING: // 3
+                        cacheStatus.textContent = 'Downloading cache...';
+                        break;
+                    case appCache.UPDATEREADY: // 4
+                        cacheStatus.textContent = 'Cache update available';
+                        cacheButton.textContent = 'Apply Update';
+                        break;
+                    case appCache.OBSOLETE: // 5
+                        cacheStatus.textContent = 'Cache is obsolete';
+                        break;
+                    default:
+                        cacheStatus.textContent = 'Cache status unknown';
+                }
+                
+                // Store cache status for future checks
+                try {
+                    localStorage.setItem('psfree_cache_status', appCache.status);
+                } catch (e) {
+                    console.log('LocalStorage not available', e);
+                }
+            }
+
+            // Check if we're online and update the UI accordingly
+            function updateOnlineStatus() {
+                const isOnline = navigator.onLine;
+                // Remove any existing badges
+                const existingBadges = document.querySelectorAll('.status-badge');
+                existingBadges.forEach(badge => badge.remove());
+                
+                if (!isOnline) {
+                    if (appCache.status === appCache.IDLE || appCache.status === appCache.UPDATEREADY) {
+                        statusText.textContent = 'Offline Mode';
+                        cacheStatus.textContent = 'Using cached resources';
+                        
+                        // Add offline badge
+                        const offlineBadge = document.createElement('span');
+                        offlineBadge.className = 'status-badge offline';
+                        offlineBadge.textContent = 'OFFLINE';
+                        document.getElementById('status-indicator').appendChild(offlineBadge);
+                        
+                        // Add cached badge
+                        const cachedBadge = document.createElement('span');
+                        cachedBadge.className = 'status-badge cached';
+                        cachedBadge.textContent = 'CACHED';
+                        cachedBadge.style.animationDelay = '0.1s';
+                        document.getElementById('status-indicator').appendChild(cachedBadge);
+                        
+                        // Add subtle glow to console to indicate offline mode
+                        document.getElementById('console-container').style.animation = 'glow 3s infinite';
+                    } else {
+                        statusText.textContent = 'Offline';
+                        cacheStatus.textContent = 'Warning: Offline but not cached!';
+                        
+                        // Add offline badge
+                        const offlineBadge = document.createElement('span');
+                        offlineBadge.className = 'status-badge offline';
+                        offlineBadge.textContent = 'OFFLINE';
+                        document.getElementById('status-indicator').appendChild(offlineBadge);
+                    }
+                } else {
+                    statusText.textContent = 'Ready';
+                    document.getElementById('console-container').style.animation = 'fadeIn 1.2s ease-out';
+                }
+            }
+
+            // Initialize UI
+            updateCacheStatus();
+            updateOnlineStatus();
+
+            // Event listeners for cache events
+            appCache.addEventListener('checking', function() {
+                cacheStatus.textContent = 'Checking cache manifest...';
+                updateCacheStatus();
+            }, false);
+
+            appCache.addEventListener('downloading', function() {
+                cacheStatus.textContent = 'Downloading cache resources...';
+                cacheButton.disabled = true;
+                updateCacheStatus();
+                
+                // Add a spinner to the button while downloading
+                cacheButton.innerHTML = '<span class="spinner"></span> Caching...';
+            }, false);
+
+            appCache.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressFill.style.width = percent + '%';
+                    cacheStatus.textContent = `Downloading: ${percent}% (${e.loaded}/${e.total})`;
+                } else {
+                    cacheStatus.textContent = 'Downloading cache resources...';
+                }
+            }, false);
+
+            appCache.addEventListener('cached', function() {
+                cacheStatus.textContent = 'Cache complete! Ready for offline use';
+                cacheButton.disabled = false;
+                cacheButton.textContent = 'Recache Resources';
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    progressFill.style.width = '0%';
+                }, 2000);
+                
+                updateCacheStatus();
+            }, false);
+
+            appCache.addEventListener('updateready', function() {
+                cacheStatus.textContent = 'Cache update ready';
+                cacheButton.disabled = false;
+                cacheButton.textContent = 'Apply Update';
+                updateCacheStatus();
+            }, false);
+
+            appCache.addEventListener('obsolete', function() {
+                cacheStatus.textContent = 'Cache is obsolete. Refresh to download new version.';
+                cacheButton.disabled = false;
+                updateCacheStatus();
+            }, false);
+
+            appCache.addEventListener('error', function(e) {
+                // Check if user is offline - don't show alarming messages if they're just offline
+                if (!navigator.onLine && (appCache.status === appCache.IDLE || localStorage.getItem('psfree_cache_status') == 1)) {
+                    // Just update the status to show we're in offline mode
+                    cacheStatus.textContent = 'Running in offline mode';
+                    cacheButton.disabled = false;
+                    updateOnlineStatus();
+                } else {
+                    // Only show error for actual caching issues when online
+                    cacheStatus.textContent = 'Cache error occurred! Tap to retry.';
+                    cacheButton.disabled = false;
+                    statusIcon.classList.add('error');
+                    statusText.textContent = 'Cache Error';
+                    console.error('Cache error:', e);
+                }
+                updateCacheStatus();
+            }, false);
+
+            // Button click handler
+            cacheButton.addEventListener('click', function() {
+                if (appCache.status === appCache.UPDATEREADY) {
+                    // Apply the update
+                    appCache.swapCache();
+                    location.reload();
+                } else {
+                    // Start the caching process
+                    try {
+                        appCache.update();
+                        cacheStatus.textContent = 'Starting cache process...';
+                        progressFill.style.width = '0%';
+                    } catch (e) {
+                        cacheStatus.textContent = 'Error starting cache: ' + e.message;
+                        console.error('Cache update error:', e);
+                    }
+                }
+            });
+
+            // Online/offline event listeners
+            window.addEventListener('online', updateOnlineStatus);
+            window.addEventListener('offline', updateOnlineStatus);
+
+            // Update exploit status
+            window.updateStatus = function(status, isError = false) {
+                statusText.textContent = status;
+                statusIcon.className = 'status-icon';
+                
+                if (isError) {
+                    statusIcon.classList.add('error');
+                } else if (status.toLowerCase().includes('complete') || status.toLowerCase().includes('success')) {
+                    statusIcon.classList.add('success');
+                } else if (status.toLowerCase() === 'ready') {
+                    statusIcon.classList.add('ready');
+                } else {
+                    statusIcon.classList.add('running');
+                }
+            };
+
+            // Update progress bar
+            window.updateProgress = function(percent) {
+                progressFill.style.width = percent + '%';
+            };
+        })();
+
+        // Add progress integration with original console logging
+        (function() {
+            // Store the original console.log function
+            const originalConsoleLog = console.log;
+            const consoleElement = document.getElementById('console');
+            
+            // Override console.log to update the UI console with styled output
+            console.log = function(...args) {
+                // Call the original console.log
+                originalConsoleLog.apply(console, args);
+                
+                // Update the console UI element
+                const text = args.map(arg => {
+                    if (typeof arg === 'object') {
+                        try {
+                            return JSON.stringify(arg);
+                        } catch (e) {
+                            return arg.toString();
+                        }
+                    }
+                    return arg;
+                }).join(' ');
+                
+                // Create a new span element for this log entry
+                const logEntry = document.createElement('span');
+                
+                // Apply appropriate styling based on content
+                if (text.includes('exploit succeeded') || text.includes('success')) {
+                    logEntry.className = 'console-success';
+                    window.updateStatus('Exploit Successful', false);
+                    window.updateProgress(100);
+                } else if (text.includes('error') || text.includes('failed')) {
+                    logEntry.className = 'console-error';
+                    window.updateStatus('Error Occurred', true);
+                } else if (text.includes('STAGE:')) {
+                    logEntry.className = 'console-stage';
+                    const stage = text.split('STAGE:')[1].trim();
+                    window.updateStatus('Running: ' + stage);
+                    
+                    // Update progress based on stage with improved tracking
+                    const stages = [
+                        'UAF SSV',
+                        'get string relative read primitive',
+                        'achieve arbitrary read/write primitive',
+                        'leak CodeBlock',
+                        'Setup',
+                        'Double free AIO queue entry',
+                        'Leak kernel addresses',
+                        'Double free SceKernelAioRWRequest',
+                        'Get arbitrary kernel read/write',
+                        'Patch kernel'
+                    ];
+                    
+                    const stageIndex = stages.findIndex(s => stage.includes(s));
+                    if (stageIndex !== -1) {
+                        const progressPercent = Math.round(((stageIndex + 1) / stages.length) * 100);
+                        window.updateProgress(progressPercent);
+                        
+                        // Add stage number to make progress clearer
+                        logEntry.textContent = `[Stage ${stageIndex + 1}/${stages.length}] ${text}\n`;
+                        consoleElement.appendChild(logEntry);
+                        consoleElement.scrollTop = consoleElement.scrollHeight;
+                        return; // Skip the default append
+                    }
+                } else if (text.includes('info') || text.includes('Info')) {
+                    logEntry.className = 'console-info';
+                }
+                
+                // Set the text and append to console
+                logEntry.textContent = text + '\n';
+                consoleElement.appendChild(logEntry);
+                consoleElement.scrollTop = consoleElement.scrollHeight;
+            };
+            
+            // Override clear_log function if it exists with improved version
+            window.clear_log_original = window.clear_log;
+            window.clear_log = function() {
+                if (window.clear_log_original) {
+                    window.clear_log_original();
+                }
+                // Clear the console with a fade effect
+                consoleElement.style.opacity = '0';
+                setTimeout(() => {
+                    consoleElement.textContent = '';
+                    consoleElement.style.opacity = '1';
+                }, 200);
+            };
+        })();
+    </script>
+
+    <!-- Original Exploit Scripts -->
+    <script src="payload.js"></script>
+    <script type="module" src="./alert.mjs"></script>
+</body>
+</html>

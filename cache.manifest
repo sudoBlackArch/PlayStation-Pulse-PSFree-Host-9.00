@@ -1,0 +1,60 @@
+CACHE MANIFEST
+# v1.1.0 - 2025-05-21
+# PSFree Modern Dark Theme by BlackArch - Enhanced UI & Offline Experience
+
+CACHE:
+# HTML Files
+index.html
+about.html
+offline-cache-docs.html
+
+# Core JavaScript
+alert.mjs
+config.mjs
+psfree.mjs
+lapse.mjs
+payload.js
+send.mjs
+
+# Binary Resources
+payload.bin
+
+# Module Files
+module/chain.mjs
+module/constants.mjs
+module/int64.mjs
+module/mem.mjs
+module/memtools.mjs
+module/offset.mjs
+module/rw.mjs
+module/utils.mjs
+module/view.mjs
+
+# ROP Data
+rop/900.mjs
+
+# Fonts
+fonts/LiberationMono-Regular.ttf
+
+# Documentation
+COPYING
+LICENSE
+README.md
+fonts/FONTS.LICENSE
+fonts/README.txt
+
+# Development Files
+kpatch/900.c
+kpatch/900.d
+kpatch/900.elf
+kpatch/900.o
+kpatch/Makefile
+kpatch/script.ld
+kpatch/types.h
+kpatch/utils.h
+
+NETWORK:
+*
+
+FALLBACK:
+/ index.html
